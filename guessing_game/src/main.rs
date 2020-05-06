@@ -14,13 +14,13 @@ fn main()
             .read_line(&mut guess)
             .expect("读取输入出错了！");
 
-        let guess: i32 = match guess.trim().parse() {
+        let guess: i32 = match guess.trim().parse() {                       // 覆盖变量，进行类型转换
             Ok(num) => num,
             Err(_) => {
                 println!("需要输入一个整数哦。。。。");
                 continue;
             },
-        };    // 覆盖变量，进行类型转换
+        };   
 
         println!("你想的是：{}", guess);
 
