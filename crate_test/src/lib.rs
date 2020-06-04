@@ -5,7 +5,7 @@ use std::time::Duration;
 use std::sync::{Mutex, Arc};
 
 
-// 定义一个迭代器
+/// 定义一个迭代器，用于计数
 struct Counter {
     count: u32
 }
@@ -29,7 +29,7 @@ impl Iterator for Counter {
     }
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
 /// 自定义一个实现Deref的智能指针
 /// 
 use std::ops::Deref;
@@ -54,8 +54,9 @@ impl<T> Deref for Mybox<T> {
 fn hello(name: &str) {
     println!("{}", name);
 }
+////////////////////////////////////////////////////////////////////////////////
 
-
+/// 创建一个线程
 fn thread_maker(transmitter: Sender<String>, vec: Vec<String>) {
     thread::spawn(move || {
         let current_threadid = thread::current().id();
@@ -66,6 +67,7 @@ fn thread_maker(transmitter: Sender<String>, vec: Vec<String>) {
     });
 }
 
+/// 通道的消费者
 fn consumer(receiver: Receiver<String>) {
     for val in receiver {
         println!("got: {}", val);
@@ -73,7 +75,7 @@ fn consumer(receiver: Receiver<String>) {
 }
 
 
-// 使用一个通道多次发送消息，主线程接受，
+/// 使用一个通道多次发送消息，主线程接受，
 pub fn send_messages_by_channel(vec: Vec<String>) {
     let (tx, rx) = mpsc::channel();
 
@@ -82,7 +84,7 @@ pub fn send_messages_by_channel(vec: Vec<String>) {
     consumer(rx);
 }
 
-
+/// 通过clone多个管道的发送端，共不同线程使用
 pub fn multi_transmitter(vec1: Vec<String>, vec2: Vec<String>) {
     let (tx, rx) = mpsc::channel();
 
@@ -94,7 +96,7 @@ pub fn multi_transmitter(vec1: Vec<String>, vec2: Vec<String>) {
     consumer(rx);
 }
 
-
+/// 单线城中Mutex的演示
 pub fn mutex_api() {
     let m = Mutex::new(5);
     {
@@ -105,7 +107,7 @@ pub fn mutex_api() {
 }
 
 
-// 使用Arc和Mutex在多线程中共享数据
+/// 使用Arc和Mutex在多线程中共享数据
 pub fn thread_mutex() {
     // 初始化一个计数器，可以线程共享，且每个线程都有所有权
     let counter = Arc::new(Mutex::new(0));
@@ -127,14 +129,14 @@ pub fn thread_mutex() {
 
     println!("result: {}", *counter.lock().unwrap());
 }
+////////////////////////////////////////////////////////////////////////////////
 
-
-// 定义一个trait，使所有元素具有统一接口
+/// 定义一个trait，使所有元素具有统一接口
 pub trait Draw {
     fn draw(&self);
 }
 
-// 定义屏幕结构，结构包含所有实现了Draw trait的对象
+/// 定义屏幕结构，结构包含所有实现了Draw trait的对象
 pub struct Screen {
     pub components: Vec<Box<dyn Draw>>,
 }
