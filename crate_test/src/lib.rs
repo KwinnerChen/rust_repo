@@ -174,3 +174,119 @@ impl Draw for SelectButton {
         println!("there is a selectbutton");
     }
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// 一个模拟的博文发布crate
+pub struct Post {
+    // 博文审核状态
+    // 提供一种思路，使用枚举
+    // 面向对象思想，其实可以用一个数值表示
+    state: Option<Box<dyn State>>,
+    // 博文内容
+    content: String,
+}
+
+impl Post {
+    pub fn new() -> Post {
+        Post {
+            state: Some(Box::new(Draft {})),
+            content: String::new()
+        }
+    }
+
+    /// 此方法用于博文的审核操作，并改变博文的审核状态
+    /// take方法将原变量只为None，并提取值赋给新的变量
+    pub fn request_review(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.request_review());
+        }
+    }
+
+    /// 向博文中添加内容
+    pub fn add_text(&mut self, text: &str) {
+        self.content.push_str(text);
+    }
+
+    /// 通过状态state接口，间接返回结构内容
+    pub fn content(&self) -> &str {
+        self.state.as_ref().unwrap().content(self)
+    }
+
+    /// 批准审批
+    pub fn approve(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.approve());
+        }
+    }
+}
+
+/// trait对象，类似面向对象的抽象基类。
+trait State {
+    /// 每一个状态结构体都应包含一个审批入口
+    /// 该接口用于改返回一个新的状态值
+    /// 注意这里self不是引用，这会时老的状态失去所有权而被放弃，
+    fn request_review(self: Box<Self>) -> Box<dyn State>;
+
+    /// 同意审批接口
+    fn approve(self: Box<Self>) -> Box<dyn State>;
+
+    /// 定义一个简介获取内容的接口，
+    /// 内容与状态相关
+    /// 默认返回空字符串，周偶状态为published时才返回真确内容
+    /// 当published时返回的时post实例的一部分，所有需要声明声明post和&str声明周期一致
+    /// 
+    fn content<'a>(&self, post: &'a Post) -> &'a str {
+        ""
+    }
+}
+
+// 结构体没有数据，只有操作，表示状态
+// 表示草稿状态
+struct Draft {}
+
+/// trait State的具体实现
+impl State for Draft {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        Box::new(PendingReview {})
+    }
+
+    // 草稿状态，同意审批则还是草稿状态，返回自身
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+}
+
+// 结构体没有数据，只有操作
+// 表示审批中
+struct PendingReview {}
+
+impl State for PendingReview {
+    // 审批中申请审批则状态还是审批中，返回自身
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+
+    // 同意审批后，状态应该为可发表状态
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        Box::new(Published {})
+    }
+}
+
+// 状态可发表
+struct  Published {}
+
+impl State for Published {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+
+    // 覆写content方法， 返回实际内容
+    fn content<'a>(&self, post: &'a Post) -> &'a str {
+        &post.content
+    }
+}
