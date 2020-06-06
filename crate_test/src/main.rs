@@ -1,5 +1,5 @@
 #![allow(unused_variables)]
-#[warn(unused_imports)]
+#![allow(dead_code)]
 
 
 use crate_test::*;

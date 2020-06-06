@@ -1,3 +1,7 @@
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
+
 use std::thread;
 use std::sync::mpsc;
 use std::sync::mpsc::{Sender, Receiver};
