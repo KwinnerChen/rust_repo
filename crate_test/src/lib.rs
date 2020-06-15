@@ -294,3 +294,51 @@ impl State for Published {
         &post.content
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+/// 测试一个全局静态变量
+pub static mut COUNT:i32 = 0;
+
+pub const ACONST_NUM: i32 = 33;
+
+pub fn add_for_count(inc: i32) {
+    unsafe {
+        COUNT += inc;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// 运算符重载
+use std::ops::Add;
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl Add for Point {
+    type Output = Point;
+
+    fn add(self, other:Point) -> Point {
+        Point {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+/// 宏实现验证
+pub fn macro_init_test() -> Vec<i32> {
+    // let vec1 = vec![1,2,3];
+    // 编译时宏被下列代码所替代
+    let vec1 = {
+        let mut temp_vec = Vec::new();
+        temp_vec.push(1);
+        temp_vec.push(2);
+        temp_vec.push(3);
+        temp_vec
+    };
+    vec1
+}

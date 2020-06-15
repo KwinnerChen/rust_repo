@@ -46,4 +46,24 @@ fn main() {
     };
 
     screen.run();
+
+    unsafe {
+        println!("befor add count is: {}", COUNT);
+    }
+    add_for_count(20);
+    unsafe {
+        println!("after add count is: {}", COUNT);
+    }
+
+    let point1 = Point{x:1, y:3};
+    let point2 = Point{x:3, y:4};
+    let point3 = Point{x:4, y:7};
+
+    assert_eq!(
+        point1 + point2,
+        point3
+    );
+    println!("{:?} + {:?} is {:?}", point1, point2, point3);
+
+    println!("{:?}", macro_init_test());
 }
