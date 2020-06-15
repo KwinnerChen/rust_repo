@@ -342,3 +342,14 @@ pub fn macro_init_test() -> Vec<i32> {
     };
     vec1
 }
+
+////////////////////////////////////////////////////////////////////////////
+/// 过程宏的trait
+pub trait HelloMacro {
+    fn hello_macro();
+}
+
+use hello_macro_derive::HelloMacro;
+
+#[derive(HelloMacro)]
+pub struct Pancakes;

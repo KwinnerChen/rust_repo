@@ -1,10 +1,14 @@
 [package]
-name = "crate_test"
+name = "hello_macro_derive"
 version = "0.1.0"
 authors = ["KwinnerChen <chenkai.c.k@hotmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+proc-macro = true
+
 [dependencies]
-hello_macro_derive = {path = "./hello_macro_derive"}
+syn = "0.14.4"
+quote = "0.6.3"

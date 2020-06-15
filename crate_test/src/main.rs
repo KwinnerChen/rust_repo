@@ -66,4 +66,6 @@ fn main() {
     println!("{:?} + {:?} is {:?}", point1, point2, point3);
 
     println!("{:?}", macro_init_test());
+
+    Pancakes::hello_macro();
 }
