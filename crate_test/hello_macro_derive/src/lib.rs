@@ -4,7 +4,7 @@ use crate::proc_macro::TokenStream;
 use quote::quote;
 use syn;
 
-#[proc_macro_derive(HelloMacro)]
+#[proc_macro_derive(Hello_Macro)]  // 指定宏的名称，该名称将被引入需要使用的作用域，且将在derive（）注解中使用。
 pub fn hello_macro_derive(input: TokenStream) -> TokenStream {
     // 构建rust代码所代表的语法树
     // 一边可以进行操作

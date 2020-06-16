@@ -349,7 +349,7 @@ pub trait HelloMacro {
     fn hello_macro();
 }
 
-use hello_macro_derive::HelloMacro;
+use hello_macro_derive::Hello_Macro;
 
-#[derive(HelloMacro)]
+#[derive(Hello_Macro)]
 pub struct Pancakes;
