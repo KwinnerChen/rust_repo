@@ -1,44 +1,67 @@
-use std::io::prelude::*;
-use std::fs;
-use std::net::TcpStream;
-use std::time::Duration;
 use std::thread;
 use std::sync::{mpsc, Arc, Mutex};
 
 
-/// 请求相应接口
-pub fn handle_connection(mut stream: TcpStream) {
-    let mut buffer = [0u8; 512];
+/// Job是一个类型别名
+/// 
+/// 代表一个可在线程间传送的闭包
+type Job = Box<dyn FnOnce() + Send + 'static>;
 
-    stream.read(&mut buffer).unwrap();
-    println!("requests: {}", String::from_utf8_lossy(&buffer));
 
-    let get = b"GET / HTTP/1.1\r\n";
-    let sleep = b"GET /sleep HTTP/1.1\r\n";
-    let status_line_ok = "HTTP/1.1 200 OK\r\n\r\n";
-    let status_line_404 = "HTTP/1.1 400 Not Found\r\n\r\n";
+/// 线程间传递的信息，包含任务和停止信号
+enum Message {
+    NewJob(Job),
+    Terminate,
+}
 
-    let (status_line, filename) = if buffer.starts_with(get) {
-        (status_line_ok, "./static/hello.html")
-    } else if buffer.starts_with(sleep) {
-        thread::sleep(Duration::from_secs(5));
-        (status_line_ok, "./static/hello.html")
-    } else {
-        (status_line_404, "./static/404.html")
-    };
-    
-    let contents = fs::read_to_string(filename).unwrap();
-    let response = format!("{}{}", status_line, contents);
 
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+/// 工作线程的包装，包含线程分配的id和线程的Option枚举
+/// Option枚举为了能在最终join时获取线程的所有权
+struct Worker {
+    id: usize,
+    thread: Option<thread::JoinHandle<()>>,
+}
+
+impl Worker {
+    /// 创建并运行一个worker线程
+    /// 
+    /// 当管道有任务时线程会立即运行
+    /// 
+    /// 否则在receiver端阻塞
+    fn new(id: usize, reciever: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker {
+        let thread = thread::spawn(move || {
+            loop {
+                // 获取一个任务信息
+                let message = reciever.lock().unwrap().recv().unwrap();
+
+                match message {
+                    // match需要穷举
+                    Message::NewJob(job) => {
+                        println!("worker {} got a job; executing.", id);
+                        // job是Box指针，函数名也是一种指针，可以直接执行
+                        job();
+                    },
+
+                    Message::Terminate => {
+                        println!("worker {} called terminate.", id);
+                        break;
+                    }
+                }
+            }
+        });
+
+        Worker {
+            id,
+            thread: Some(thread),
+        }
+    }
 }
 
 
 /// 构造线程池
 pub struct ThreadPool {
     workers: Vec<Worker>,
-    sender: mpsc::Sender<Job>,
+    sender: mpsc::Sender<Message>,
 }
 
 impl ThreadPool {
@@ -73,34 +96,26 @@ impl ThreadPool {
             F: FnOnce() + Send + 'static
         {
             let job = Box::new(f);
-            self.sender.send(job).unwrap();
+            self.sender.send(Message::NewJob(job)).unwrap();
         }
 }
 
+/// 为ThreadPool实现drop方法，在跳出作用域时实现线程清理工作
+/// 作用域为调用实例ThreadPool的作用域
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        println!("sending terminate message to all workers!");
+        // 清理时向所有线程发送停止信号
+        for _ in &mut self.workers {
+            self.sender.send(Message::Terminate).unwrap();
+        }
 
-struct Worker {
-    id: usize,
-    thread: thread::JoinHandle<()>,
-}
-
-impl Worker {
-    fn new(id: usize, reciever: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
-        let thread = thread::spawn(move || {
-            loop {
-                let job = reciever.lock().unwrap().recv().unwrap();
-                println!("worker {} got a job; executing.", id);
-                // job是Box指针，函数名也是一种指针，可以直接执行
-                job();
+        for workder in &mut self.workers {
+            println!("shutting down worker {}", workder.id);
+            // take方法将取出Some中的值，并替换为None，如果是None时不会有动作
+            if let Some(thread) = workder.thread.take() {
+                thread.join().unwrap();
             }
-        });
-
-        Worker {
-            id,
-            thread,
         }
     }
 }
-
-
-// Job是一个
-type Job = Box<dyn FnOnce() + Send + 'static>;
