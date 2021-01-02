@@ -13,12 +13,13 @@ const STATUS_LINE_404: &str = "HTTP/1.1 400 Not Found\r\n\r\n";
 
 /// 请求相应接口
 pub fn handle_connection(mut stream: TcpStream) {
-    let mut buffer = [0u8; 512];
-
-    stream.read(&mut buffer).unwrap();
-    println!("requests: {}", String::from_utf8_lossy(&buffer));
-
+    let mut buffer = [0; 512];
     
+    // read返回读取字节的Result
+    // 当缓冲区非零而返回值为零时，则流数据读取到尽头
+    // read是一个阻塞的方法
+    stream.read(&mut buffer).unwrap();
+    println!("{}", String::from_utf8_lossy(&buffer));
 
     let (status_line, filename) = if buffer.starts_with(GET) {
         (STATUS_LINE_OK, "./static/hello.html")
