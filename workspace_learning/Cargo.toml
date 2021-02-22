@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "bench_example",
+    "logic_gates",
+    "generac_type",
+    "complex",
+    "borrowing_match",
+    "linked_list",
+]

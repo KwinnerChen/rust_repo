@@ -1,0 +1,21 @@
+[package]
+name = "bench_example"
+version = "0.1.0"
+authors = ["KwinnerChen <chenkai.c.k@hotmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+
+[dev_dependencies]
+criterion = "0.1"   # 用于基准测试的第三方库
+
+# 表明创建一个名为fibonacci的基准测试，但是不使用内置基准测试工具
+# 有可能需要明示测试函数定义的位置
+# 调用cargo bench命令时将被次命令代替
+[[bench]]  
+name = "fibonacci"
+harness = false
+path = "benchs/fibonacci.rs"
