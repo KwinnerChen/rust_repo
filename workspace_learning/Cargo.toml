@@ -7,4 +7,5 @@ members = [
     "borrowing_match",
     "linked_list",
     "macro_map",
+    "http_tester",
 ]
