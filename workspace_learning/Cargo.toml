@@ -6,4 +6,5 @@ members = [
     "complex",
     "borrowing_match",
     "linked_list",
+    "macro_map",
 ]
