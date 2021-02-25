@@ -8,4 +8,5 @@ members = [
     "linked_list",
     "macro_map",
     "http_tester",
+    "rudis_sync",
 ]
