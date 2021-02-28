@@ -7,3 +7,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tokio = "0.1"    # 封装mio并提供一个运行异步代码的运行时
+futures = "0.1"   # 为处理异步代码提供更清晰的抽象
+lazy_static = "1.2"    # 允许创建一个可修改的动态全局变量
+resp = {git = "https://github.com/creativcoder/resp"}    # 一个可以解析Redis协议的开源软件包
+tokio-codec = "0.1"    # 允许用户将来自网络的字节流转换为给定类型，并根据指定的编码解码器将其解析为明确的消息。编解码器将字节流转换为tokio生态系统中被成为帧的明文信息
+bytes = "0.4"    # 与tokio编解码器一起使用，可以有效地将字节流转换为给定的帧
