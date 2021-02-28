@@ -9,4 +9,5 @@ members = [
     "macro_map",
     "http_tester",
     "rudis_sync",
+    "rudis_async",
 ]
