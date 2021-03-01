@@ -40,7 +40,7 @@ fn main() {
 
         // 用于处理一个链接请求
         // 这里可以使用线程池，Rudis_db是Mutex
-        handle_client(stream);
+        thread::spawn(move || handle_client(stream));
     }
 }
 
