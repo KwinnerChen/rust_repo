@@ -10,4 +10,5 @@ members = [
     "http_tester",
     "rudis_sync",
     "rudis_async",
+    "hyperurl",
 ]
