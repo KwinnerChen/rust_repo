@@ -11,4 +11,5 @@ members = [
     "rudis_sync",
     "rudis_async",
     "hyperurl",
+    "shorten",
 ]

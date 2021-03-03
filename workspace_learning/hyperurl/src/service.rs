@@ -29,17 +29,20 @@ pub fn url_service(req: Request<Body>) -> BoxFut {
 
         let url_to_shorten = str::from_utf8(&c)
         .unwrap();
+        log::info!("recieve the url to shorten: {}", url_to_shorten);
 
         let shortened_url = shorten_url(url_to_shorten);
 
         let _ = SHORT_URLS
         .write()
         .unwrap()
-        .insert(shortened_url.to_string(), url_to_shorten.to_string());
+        .insert(url_to_shorten.to_string(), shortened_url.to_string());
 
         let a = &*SHORT_URLS
         .read()
-        .unwrap();
+        .unwrap()
+        .get(url_to_shorten)
+        .unwrap().clone();
 
         Response::new(Body::from(format!("{:?}", a)))
     });
