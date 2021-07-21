@@ -36,6 +36,7 @@ async fn main() -> io::Result<()> {
 mod tests {
     use super::*;
     use tokio::io::{AsyncWriteExt, AsyncReadExt};
+    use tokio::select;
 
     #[test]
     fn test_echo_server() {
@@ -63,5 +64,19 @@ mod tests {
                 println!("got {}", String::from_utf8_lossy(&buffer[..n]));
             }
         });
+    }
+
+    async fn return_num(n: i32) -> i32 {
+        n
+    }
+
+    #[tokio::test]
+    async fn test_select() {
+        let res = select! {
+            a_res = return_num(1) => a_res,
+            b_res = return_num(2) => b_res,
+        };
+
+        println!("select result is: {}", res);
     }
 }
