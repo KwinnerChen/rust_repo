@@ -1754,6 +1754,7 @@ dependencies = [
  "bytes 1.0.1",
  "lazy_static",
  "mini-redis",
+ "rand 0.8.3",
  "tokio 1.8.1",
 ]
 
