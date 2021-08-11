@@ -31,9 +31,9 @@ async fn handle(mut stream: TcpStream) {
     // 值可能在线程件传递
     // 基于rust严格的作用域和生命周期规则
     // 增加一个代码块，用来将不具有Send特征的类型在传递前调用Drop特征删除
-    let secs = {
+    let secs = {  // 用于模拟工作负载
         let mut rng = rand::thread_rng();
-        rng.gen_range(2..=10)
+        rng.gen_range(1..=5)
     };
 
     sleep(Duration::from_secs(secs)).await;
